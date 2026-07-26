@@ -1,32 +1,15 @@
 <!--
 Sync Impact Report
 ==================
-Version change: 1.0.0 → 2.0.0
+Version change: 2.0.0 → 2.1.0
 Modified principles: N/A
 Added sections:
-  - V. Hexagonal Architecture
-  - VI. Microservice Conventions
-  - VII. Domain Events
-  - VIII. Saga Rules
-  - IX. Testing by Layer
+  - Repository Structure (umbrella + submodule model)
 Templates requiring updates:
   - .specify/templates/plan-template.md ✅ no changes needed (generic)
   - .specify/templates/spec-template.md ✅ no changes needed (generic)
   - .specify/templates/tasks-template.md ✅ no changes needed (generic)
-Skills requiring updates:
-  - .opencode/commands/hexagonal.scaffold.md ✅ created
-  - .opencode/commands/hexagonal.add-entity.md ✅ created
-  - .opencode/commands/hexagonal.add-usecase.md ✅ created
-  - .opencode/commands/hexagonal.add-event.md ✅ created
-  - .opencode/commands/hexagonal.add-test.md ✅ created
-  - .opencode/commands/orders.add-state.md ✅ created
-  - .opencode/commands/orders.add-strategy.md ✅ created
-  - .opencode/commands/orders.create-saga.md ✅ created
-  - .opencode/commands/orders.add-cqrs.md ✅ created
-  - .opencode/commands/payments.idempotent.md ✅ created
-  - .opencode/commands/notifications.add-consumer.md ✅ created
-  - .opencode/commands/shared.add-feign-client.md ✅ created
-  - .opencode/commands/shared.add-circuit-breaker.md ✅ created
+Skills requiring updates: none
 Follow-up TODOs: none
 -->
 
@@ -130,6 +113,13 @@ Tests MUST follow the testing pyramid with clear separation by architectural lay
 - **Architecture tests** (ArchUnit): Enforce hexagonal boundaries: domain MUST NOT import from infrastructure. Controllers MUST NOT import from repositories. Package naming conventions MUST be followed. Dependencies MUST NOT be circular.
 - **Contract tests**: When services communicate via APIs, verify request/response contracts. Events published by one service MUST match the schema expected by consumers.
 
+## Repository Structure
+
+- **Umbrella repo** (`umbrella`): Parent repo containing specs, docs, and shared configuration. Specs in `specs/` are the source of truth.
+- **Microservice repos**: Each microservice lives as a git submodule under `modules/` (e.g., `modules/microservice-template`). Cloned from the template base.
+- **Polyrepo model**: Each microservice has its own repository. The umbrella repo references them as submodules for coordination.
+- **Specs location**: All feature specifications live in `specs/` at the umbrella level, NOT inside individual microservice repos.
+
 ## Technology Stack Constraints
 
 - **Language**: Java 21 (LTS). Use modern language features (records, sealed classes, pattern matching) where appropriate.
@@ -159,4 +149,4 @@ Amendments require:
 
 Compliance is verified during code review and CI. Non-compliant code MUST NOT be merged.
 
-**Version**: 2.0.0 | **Ratified**: 2026-07-26 | **Last Amended**: 2026-07-26
+**Version**: 2.1.0 | **Ratified**: 2026-07-26 | **Last Amended**: 2026-07-26

@@ -45,11 +45,11 @@
 
 ### Implementation
 
-- [ ] T003 [P] [US2] Add Redis service with health check to `modules/microservice-template/docker-compose.yml`
-- [ ] T004 [P] [US2] Add Kafka KRaft service with health check to `modules/microservice-template/docker-compose.yml`
-- [ ] T005 [US2] Add Docker network `microservice-net` and attach all services in `modules/microservice-template/docker-compose.yml`
-- [ ] T006 [US2] Add `depends_on` health conditions to app service in `modules/microservice-template/docker-compose.yml`
-- [ ] T007 [P] [US2] Add Redis and Kafka connection properties to `modules/microservice-template/src/main/resources/application-local.yaml`
+- [x] T003 [P] [US2] Add Redis service with health check to `modules/microservice-template/docker-compose.yml`
+- [x] T004 [P] [US2] Add Kafka KRaft service with health check to `modules/microservice-template/docker-compose.yml`
+- [x] T005 [US2] Add Docker network `microservice-net` and attach all services in `modules/microservice-template/docker-compose.yml`
+- [x] T006 [US2] Add `depends_on` health conditions to app service in `modules/microservice-template/docker-compose.yml`
+- [x] T007 [P] [US2] Add Redis and Kafka connection properties to `modules/microservice-template/src/main/resources/application-local.yaml`
 
 **Checkpoint**: Full stack runs with all services healthy and connected.
 

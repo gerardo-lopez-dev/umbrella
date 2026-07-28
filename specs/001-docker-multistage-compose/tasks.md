@@ -59,8 +59,8 @@
 
 **Purpose**: Verify everything works end-to-end per quickstart.md
 
-- [ ] T008 Run quickstart.md validation steps to verify full stack functionality
-- [ ] T009 Verify layer caching by building image twice and confirming <60s rebuild
+- [X] T008 Run quickstart.md validation steps to verify full stack functionality
+- [X] T009 Verify layer caching by building image twice and confirming <60s rebuild
 
 ---
 

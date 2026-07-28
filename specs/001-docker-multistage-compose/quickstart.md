@@ -45,7 +45,7 @@ docker compose exec redis redis-cli ping
 ### 5. Verify Kafka
 
 ```bash
-docker compose exec kafka kafka-topics --bootstrap-server localhost:9092 --list
+docker compose exec kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
 ```
 
 **Expected**: Returns empty list (no topics yet) without error.

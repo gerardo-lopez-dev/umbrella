@@ -1,3 +1,9 @@
 node_modules/
 .env
 dist/
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+.vscode/
+.idea/

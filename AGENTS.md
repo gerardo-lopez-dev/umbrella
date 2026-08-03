@@ -55,6 +55,7 @@ These are non-negotiable. Do not break them.
 ## References
 
 - `CONTRIBUTING.md` — spec change process.
+- `BRANCHING.md` — branching convention (GitHub Flow, all repos).
 - `docs/WORKFLOW.md` — end-to-end workflow (bootstrap, feature lifecycle, manual
   branch fan-out across modules).
 - `docs/prompt-umbrella-speckit.md` — bootstrap steps to assemble this structure.

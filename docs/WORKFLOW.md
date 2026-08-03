@@ -5,6 +5,9 @@ binding rules (pinning, cascade, spec-change flow) live in `AGENTS.md` and
 `CONTRIBUTING.md`; this document is the runnable procedure.
 
 > **Decisions:**
+> - **Branching convention:** GitHub Flow in every repo — `main` as the only
+>   trunk, short-lived feature branches merged via PR and deleted after merge.
+>   No `develop`/`release`/`hotfix` branches. See `BRANCHING.md`.
 > - **No third-party speckit preset/extension.** The community tools
 >   (`multi-repo-sync` extension, `multi-repo-branching` preset) exist and are
 >   documented in `docs/multi-repo-speckit-verification.md` as research
@@ -28,6 +31,31 @@ binding rules (pinning, cascade, spec-change flow) live in `AGENTS.md` and
 The `specs` repo is mounted twice: at `modulos/specs-lib` (umbrella reference)
 and at `modulos/<module>/specs` (each module's working copy). Both are pinned to
 the same tag.
+
+## 1.1 Operating model — everything from the umbrella root
+
+The umbrella is the **only** session workspace. Never `cd` into a submodule or
+start a session inside one; every phase runs from the umbrella root:
+
+- **Files** are reached with umbrella-relative paths (`modulos/specs-lib/...`,
+  `modulos/<module>/...`).
+- **Submodule git** uses `git -C modulos/<m> ...`.
+- **GitHub** uses `gh` with the repo resolved from the submodule's remote.
+- **Speckit context** resolves via `SPECIFY_FEATURE_DIRECTORY=modulos/<target>/...`
+  (override supported by `get_feature_paths`); `SPECIFY_INIT_DIR` only when the
+  target has its own `.specify/feature.json`.
+
+Single entry point: `/speckit.umbrella.run <target> <phase>`.
+
+| Target | Root on disk | Phases |
+|--------|--------------|--------|
+| `specs` | `modulos/specs-lib` | `specify`, `plan`, `tasks` |
+| `umbrella` | `.` | `fanout` (branch to affected modules) |
+| `<module>` | `modulos/<module>` | `implement`, `verify` |
+
+Example: `/speckit.umbrella.run microservice-template implement` implements the
+module's tasks (from `.agent-context` → its task file under the module-mounted
+specs) without leaving the umbrella root.
 
 ---
 
@@ -100,6 +128,15 @@ Then create `.specify/memory/.agent-context` inside the module, pointing at the
 if there are real overrides (e.g. the module's language test framework);
 otherwise skip it.
 → Commit: `chore: agrega modulo <module> con specs pineado`
+
+Apply the branch-protection convention to the new module's `main` (GitHub Flow,
+`BRANCHING.md`) — idempotent, auto-detects the CI checks:
+
+```sh
+bash .specify/scripts/bash/module-bootstrap.sh <module> --dry-run   # review first
+bash .specify/scripts/bash/module-bootstrap.sh <module>             # apply
+```
+→ Commit: `chore: configura branch protection de <module> (main)`
 
 ### Step 5 — Document the constitution cascade
 

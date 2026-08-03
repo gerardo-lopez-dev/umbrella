@@ -9,10 +9,8 @@ binding rules (pinning, cascade, spec-change flow) live in `AGENTS.md` and
 >   trunk, short-lived feature branches merged via PR and deleted after merge.
 >   No `develop`/`release`/`hotfix` branches. See `BRANCHING.md`.
 > - **No third-party speckit preset/extension.** The community tools
->   (`multi-repo-sync` extension, `multi-repo-branching` preset) exist and are
->   documented in `docs/multi-repo-speckit-verification.md` as research
->   reference only. They are unproven for this setup and add upgrade-fragile
->   automation.
+>   (`multi-repo-sync` extension, `multi-repo-branching` preset) exist but are
+>   unproven for this setup and add upgrade-fragile automation.
 > - **Automation is built in-house, by us.** Branch fan-out is manual with plain
 >   `git` (section 4) by default; when it needs automation, we **must** write
 >   our own speckit extension (section 4.1) — owned, tested, and maintained by
@@ -423,5 +421,4 @@ Discovery (`.agent-context`) lives per repo:
 - Modules are added/removed by repeating step 4 of section 2; nothing else
   changes.
 - If manual fan-out becomes the bottleneck, we automate with our own extension
-  (section 4.1) — never a third-party one. Community tools in
-  `docs/multi-repo-speckit-verification.md` are research reference only.
+  (section 4.1) — never a third-party one.

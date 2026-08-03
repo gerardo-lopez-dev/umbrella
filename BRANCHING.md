@@ -51,4 +51,4 @@ bash .specify/scripts/bash/module-bootstrap.sh <module>             # apply (ide
 
 - Workflow and fan-out: `docs/WORKFLOW.md` (sections 4 / 4.1).
 - Spec change process: `CONTRIBUTING.md`.
-- Example end-to-end flow: `docs/flujo-ejemplo-post01.md`.
+- Example end-to-end flow: `docs/flujo-ejemplo-post01.html`.

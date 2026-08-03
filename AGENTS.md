@@ -6,7 +6,7 @@
 (speckit). It does not hold implementation code: it pins shared specs and the
 implementation modules (each in its own repo) as git submodules.
 
-The target structure (being assembled following `docs/prompt-umbrella-speckit.md`):
+The target structure:
 
 ```
 . (this repo, umbrella)
@@ -58,5 +58,4 @@ These are non-negotiable. Do not break them.
 - `BRANCHING.md` — branching convention (GitHub Flow, all repos).
 - `docs/WORKFLOW.md` — end-to-end workflow (bootstrap, feature lifecycle, manual
   branch fan-out across modules).
-- `docs/prompt-umbrella-speckit.md` — bootstrap steps to assemble this structure.
 - `docs/ROADMAP.md` — project roadmap.

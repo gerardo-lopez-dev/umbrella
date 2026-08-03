@@ -1,0 +1,3 @@
+[submodule "modulos/specs-lib"]
+	path = modulos/specs-lib
+	url = git@github.com:gerardo-lopez-dev/specs.git

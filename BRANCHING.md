@@ -16,6 +16,8 @@ merge. No `develop`, no `release/*`, no `hotfix/*`.
 2. Every change is a short-lived feature branch → PR → merge to `main` → delete
    the branch.
 3. Branch names use the feature tag: `NNN-slug` (e.g. `001-spring-profiles`).
+   The name is **decided by the assistant**, not typed: `NNN` from the ROADMAP
+   post number, `slug` the kebab-case feature title.
 4. One branch name per feature across every repo it touches (same name, multiple
    repos — PRs line up).
 5. A feature branch is always born from the current `main` of the repo it lives

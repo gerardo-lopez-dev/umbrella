@@ -91,6 +91,9 @@
       <code>specs</code> → <code>modulos/specs-lib</code> ·
       <code>umbrella</code> → root ·
       módulo → <code>modulos/&lt;módulo&gt;</code>
+      <br><br>El nombre de la feature/rama (<code>NNN-slug</code>, convención
+      <code>BRANCHING.md</code>) lo decide el asistente desde el ROADMAP — no lo escribís vos.
+      <br>Antes de empezar (una sola vez): <code>git submodule update --init --recursive</code>
     </div>
   </header>
 
@@ -112,102 +115,77 @@
 <script>
 const STEPS = [
   {
-    t:"Paso 0 · Sincronizar", sub:"Preparar los submodules antes de arrancar",
-    repos:{umbrella:true, specs:false, module:false},
-    cmds:[{repo:"umbrella", code:"git submodule update --init --recursive"}],
-    result:[
-      "<b>specs-lib</b> y <b>microservice-template/specs</b> en <code>spec-v1.0.0</code>",
-      "<b>microservice-template</b> en su <code>main</code>"
-    ],
-    note:"Todo el trabajo ocurre dentro del umbrella; los submodules son los que se mueven."
-  },
-  {
-    t:"Paso 1 · Especificar", sub:"Crear la rama de feature y el spec en el repo de specs",
+    t:"Grupo 1 · Definir", sub:"Especificar qué se construye, planificar y descomponer en tareas. Todo en el repo de specs.",
     repos:{umbrella:false, specs:true, module:false},
-    cmds:[{repo:"specs", code:"/speckit.umbrella.run specs specify 001-spring-profiles"}],
-    result:[
-      "Rama <code>001-spring-profiles</code> creada en el repo de specs",
-      "<code>specs/001-spring-profiles/spec.md</code> con las user stories del Post 01"
-    ],
-    note:"Una feature = un directorio en specs. El spec es por feature, no por repo."
-  },
-  {
-    t:"Paso 2 · Planificar", sub:"Generar el plan y declarar qué repos se tocan",
-    repos:{umbrella:false, specs:true, module:false},
-    cmds:[{repo:"specs", code:"/speckit.umbrella.run specs plan"}],
-    result:[
-      "<code>research.md</code>, <code>plan.md</code>, <code>data-model.md</code>, <code>contracts/</code>",
-      "En <code>plan.md</code>: <b>Affected Repositories: microservice-template</b>",
-      "Hook <code>after_plan</code> de <b>umbrella-fanout</b> ofrece el fan-out"
+    que:"El asistente define <b>qué</b> y <b>cómo</b>: especificación, plan (con los repos afectados) y tareas por módulo. El nombre de la feature/rama (<code>NNN-slug</code>) lo decide el asistente según el ROADMAP — Post 01 → <code>001-spring-profiles</code>.",
+    phases:[
+      {
+        t:"Especificar",
+        cmds:[{repo:"specs", code:"/speckit.umbrella.run specs specify"}],
+        result:[
+          "Crea <code>specs/001-spring-profiles/spec.md</code> con las user stories (nombre decidido por el asistente)"
+        ]
+      },
+      {
+        t:"Planificar (+ fan-out)",
+        cmds:[{repo:"specs", code:"/speckit.umbrella.run specs plan"}],
+        result:[
+          "<code>plan.md</code> con <b>Affected Repositories: microservice-template</b>",
+          "El hook <code>after_plan</code> fanea la rama a los repos afectados (base <code>main</code>, solo los que toca la feature)"
+        ]
+      },
+      {
+        t:"Tasks",
+        cmds:[{repo:"specs", code:"/speckit.umbrella.run specs tasks"}],
+        result:[
+          "<code>tasks.md</code> + <code>tasks/microservice-template.md</code>"
+        ]
+      }
     ]
   },
   {
-    t:"Paso 3 · Fan-out", sub:"Llevar la rama solo a los repos afectados",
-    repos:{umbrella:true, specs:true, module:true},
-    cmds:[
-      {repo:"umbrella", code:"/speckit.umbrella.run umbrella fanout --plan modulos/specs-lib/specs/001-spring-profiles/plan.md --dry-run"},
-      {repo:"umbrella", code:"# sin --dry-run cuando se vea bien (o el hook after_plan lo hace)"},
-      {repo:"umbrella", code:"git -C modulos/specs-lib checkout -b 001-spring-profiles"},
-      {repo:"umbrella", code:"git -C modulos/microservice-template fetch origin && git -C modulos/microservice-template checkout -b 001-spring-profiles origin/main"},
-      {repo:"umbrella", code:"# base = main por defecto (config umbrella_fanout.base), siempre origin/main post-fetch:"},
-      {repo:"umbrella", code:".specify/scripts/bash/fanout.sh --branch 001-spring-profiles -m microservice-template --dry-run"}
-    ],
-    result:[
-      "Rama <code>001-spring-profiles</code> en <b>specs</b> y <b>microservice-template</b>",
-      "Base: <code>main</code> por defecto (config), siempre <code>origin/main</code> post-fetch; specs sale de su troncal",
-      "<b>No</b> se crea en repos que la feature no toca"
-    ],
-    note:"La extensión lee Affected Repositories del plan; nunca fanea a todos los módulos."
-  },
-  {
-    t:"Paso 4 · Tasks", sub:"Desglosar el trabajo en tareas, una por módulo",
-    repos:{umbrella:false, specs:true, module:false},
-    cmds:[{repo:"specs", code:"/speckit.umbrella.run specs tasks"}],
-    result:[
-      "<code>tasks.md</code> (compartidas) + <code>tasks/microservice-template.md</code>",
-      "Hook <code>after_tasks</code>: fan-out idempotente (la rama ya existe)"
-    ]
-  },
-  {
-    t:"Paso 5 · Implementar", sub:"Ejecutar solo las tareas del módulo, en el módulo",
+    t:"Grupo 2 · Construir", sub:"Implementar las tareas del módulo y validar contra el spec. Todo en el módulo.",
     repos:{umbrella:false, specs:false, module:true},
-    cmds:[
-      {repo:"umbrella", code:"/speckit.umbrella.run microservice-template implement"},
-      {repo:"umbrella", code:"git -C modulos/microservice-template checkout 001-spring-profiles"},
-      {repo:"umbrella", code:"git -C modulos/microservice-template/specs checkout 001-spring-profiles"}
-    ],
-    result:[
-      "Lee <code>.agent-context</code> → su task file → constitution en cascada",
-      "Implementa: <code>application-{local,dev,prod,test}.yaml</code>, <code>.env.example</code>, validación de env"
-    ],
-    note:"Desde el umbrella: se trabaja contra la rama de la feature en el specs/ del módulo (git -C), y se implementa bajo modulos/microservice-template/."
-  },
-  {
-    t:"Paso 6 · Verificar", sub:"Cerrar el ciclo con evidencia",
-    repos:{umbrella:false, specs:false, module:true},
-    cmds:[{repo:"module", code:"/speckit.umbrella.run microservice-template verify"}],
-    result:[
-      "Tasks completadas y checklists verdes",
-      "<code>./mvnw test</code> y ajuste contra <code>spec.md</code>/contracts",
-      "Veredicto: <b>PASS</b> / FAIL / PARTIAL"
+    que:"Se implementa solo lo que toca a este módulo, leyendo su task file y la constitution en cascada, y se verifica contra el spec.",
+    phases:[
+      {
+        t:"Implementar",
+        cmds:[{repo:"module", code:"/speckit.umbrella.run microservice-template implement"}],
+        result:[
+          "Lee <code>.agent-context</code> → su task file → constitution en cascada",
+          "Implementa: <code>application-{local,dev,prod,test}.yaml</code>, <code>.env.example</code>, validación de env"
+        ]
+      },
+      {
+        t:"Verificar",
+        cmds:[{repo:"module", code:"/speckit.umbrella.run microservice-template verify"}],
+        result:[
+          "<code>./mvnw test</code> y ajuste contra <code>spec.md</code>/contracts",
+          "Veredicto: <b>PASS</b> / FAIL / PARTIAL"
+        ]
+      }
     ]
   },
   {
-    t:"Paso 7 · Entregar", sub:"PRs, tag y actualización explícita de pointers",
+    t:"Grupo 3 · Entregar", sub:"Cerrar la feature: PRs a main, tag y actualización de pointers.",
     repos:{umbrella:true, specs:true, module:true},
-    cmds:[
-      {repo:"module", code:"PR en microservice-template: 001-spring-profiles → main (obligatorio: 1 review + CI build, branch protection)"},
-      {repo:"specs", code:"PR en specs: 001-spring-profiles → main (tasks checkeadas)"},
-      {repo:"specs", code:"git -C modulos/specs-lib tag spec-v1.1.0   # + CHANGELOG.md"},
-      {repo:"umbrella", code:"git -C modulos/microservice-template/specs checkout spec-v1.1.0"},
-      {repo:"module", code:"git -C modulos/microservice-template add specs && git commit -m \"chore: pin specs to spec-v1.1.0\""}
-    ],
-    result:[
-      "Template con el Post 01 implementado, specs en <code>spec-v1.1.0</code>",
-      "Cada módulo mueve su pointer <b>cuando decide</b>, nunca automático",
-      "El Post 02 (Docker) repite el mismo ciclo"
-    ],
-    note:"Módulo nuevo → protegé su main igual: bash .specify/scripts/bash/module-bootstrap.sh &lt;module&gt; (convención en BRANCHING.md)."
+    que:"La rama se mergea vía PR (obligatorio por branch protection), specs avanza de tag con CHANGELOG y cada módulo decide cuándo mover su pointer.",
+    phases:[
+      {
+        t:"Entregar",
+        cmds:[
+          {repo:"module", code:"PR en microservice-template: 001-spring-profiles → main (1 review + CI build, branch protection)"},
+          {repo:"specs", code:"PR en specs: 001-spring-profiles → main (tasks checkeadas)"},
+          {repo:"specs", code:"git -C modulos/specs-lib tag spec-v1.1.0   # + CHANGELOG.md"},
+          {repo:"umbrella", code:"git -C modulos/microservice-template/specs checkout spec-v1.1.0"},
+          {repo:"module", code:"git -C modulos/microservice-template add specs && git commit -m \"chore: pin specs to spec-v1.1.0\""}
+        ],
+        result:[
+          "Template con el Post 01 implementado, specs en <code>spec-v1.1.0</code>",
+          "Cada módulo mueve su pointer <b>cuando decide</b>, nunca automático"
+        ]
+      }
+    ]
   }
 ];
 
@@ -239,10 +217,11 @@ function render(){
       <h2>${s.t}</h2>
       <p class="sub">${s.sub}</p>
       <div class="repos">${renderRepos(s.repos)}</div>
-      <h3>Acciones</h3>
-      ${renderCmds(s.cmds)}
-      <div class="result"><b>Resultado esperado:</b>${s.result.map(r=>"<br>• "+r).join("")}</div>
-      ${s.note?`<div class="note">${s.note}</div>`:""}
+      <div class="note">${s.que}</div>
+      ${s.phases.map(p=>`
+        <h3>${p.t}</h3>
+        ${renderCmds(p.cmds)}
+        <div class="result"><b>Resultado esperado:</b>${p.result.map(r=>"<br>• "+r).join("")}</div>`).join("")}
     </div>`;
 
   // dots

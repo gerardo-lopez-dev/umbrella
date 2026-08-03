@@ -14,7 +14,8 @@ Expected shape: `/speckit.umbrella.run <target> <phase> [args]`
 
 - `<target>` — where to work: `specs` | `umbrella` | a module name (e.g. `microservice-template`).
 - `<phase>` — what to run: `specify` | `plan` | `tasks` | `implement` | `verify` | `fanout`.
-- `[args]` — extra arguments passed through to the underlying phase (e.g. the feature name for `specify`).
+- `[args]` — extra arguments passed through to the underlying phase. `specify`
+  takes an optional feature name; if omitted, you derive it (see below).
 
 ## Operating model (binding)
 
@@ -40,7 +41,11 @@ Target map:
 
 2. **Dispatch the phase** (all commands run from the umbrella root):
 
-   - **`specify <feature>`** → create the feature in the specs repo. Set
+   - **`specify [<feature>]`** → create the feature in the specs repo. Feature
+     name follows the `NNN-slug` convention (`BRANCHING.md`): `NNN` from the
+     ROADMAP post number, `slug` the kebab-case title. If not given, derive it
+     from the ROADMAP item the user points at (e.g. "Post 01" →
+     `001-spring-profiles`) and report it to the user. Set
      `SPECIFY_FEATURE_DIRECTORY=modulos/specs-lib/specs/<feature>` so the
      umbrella's speckit scripts resolve the right feature dir; follow the
      `/speckit.specify` command for the rest.

@@ -1,3 +1,0 @@
-[submodule "modules/microservice-template"]
-	path = modules/microservice-template
-	url = git@github.com:gerardo-lopez-dev/microservice-template.git

@@ -1,3 +1,6 @@
 [submodule "modulos/specs-lib"]
 	path = modulos/specs-lib
 	url = git@github.com:gerardo-lopez-dev/specs.git
+[submodule "modulos/microservice-template"]
+	path = modulos/microservice-template
+	url = git@github.com:gerardo-lopez-dev/microservice-template.git

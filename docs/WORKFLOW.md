@@ -162,8 +162,9 @@ in section 4 remains the documented fallback.
 
 - Show the full repo tree with all submodules.
 - Show `git log --oneline` of this session's commits.
-- List anything pending on you (remote repos created, branch protection on the
-  specs repo, permissions).
+- List anything pending on you (remote repos created, permissions).
+  ✅ Branch protection on the specs repo `main` is applied (1 review, admins
+  enforced, no force-push/deletions).
 
 No commit in this step — it is a summary.
 
@@ -244,8 +245,10 @@ machinery. They compose:
 
 1. **Init** — `specify init --here --integration opencode` (done at
    bootstrap; per-project if the specs repo is its own speckit project).
-2. **Specify** — `/speckit.specify` creates the feature branch in the specs
-   repo and the feature directory (`specs/NNN-name/`).
+2. **Specify** — `/speckit.umbrella.run specs specify` creates the feature
+   directory (`specs/NNN-name/` + `spec.md`). Branch creation happens at fan-out
+   (step 4); the branch name `NNN-slug` is derived by the assistant from the
+   ROADMAP post (BRANCHING.md) — never typed.
 3. **Plan** — `/speckit.plan` generates `spec.md`, `data-model.md`, contracts,
    and `plan.md`. In `plan.md`, record an **Affected Repositories** list: every
    module whose implementation will change.
@@ -275,7 +278,8 @@ Branching model in the specs repo:
 
 - `main` holds approved specs; tags `spec-vX.Y.Z` mark released versions.
 - Each feature gets its own branch in the specs repo (e.g. `001-auth-backend`),
-  created by `/speckit.specify`.
+  created by the fan-out (section 4) and named by the assistant following
+  `NNN-slug` (BRANCHING.md).
 - If several developers work on the same feature, they branch off the feature
   branch with per-owner working branches (`001-auth-backend`, `001-auth-api`)
   and PR back into the feature branch.
@@ -326,10 +330,10 @@ git submodule update --init --recursive
 git -C modulos/specs-lib fetch origin
 git -C modulos/specs-lib checkout -b <feature-branch>
 
-# each affected module
+# each affected module — always born from the latest origin/main (base = main)
 for m in users products orders; do
   git -C modulos/$m fetch origin
-  git -C modulos/$m checkout -b <feature-branch>
+  git -C modulos/$m checkout -b <feature-branch> origin/main
 done
 ```
 
@@ -339,6 +343,8 @@ Notes:
 - `git submodule update --init --recursive` also materializes each module's
   `specs/` submodule before work starts.
 - Same branch name everywhere so PRs line up. Different repos, one branch name.
+- Base is `main` by default (config `umbrella_fanout.base`). A module with a
+  different trunk forces `--base` via `fanout.sh`.
 
 ## 4.1 Own automation (in-house extension) — build plan
 
@@ -355,8 +361,8 @@ written, tested, and maintained by us. **Status: implemented (`v0.1.0`).**
    - `after_tasks` → create the matching branch in each affected module
      (`/speckit.umbrella-fanout.fanout`).
    Registered in `.specify/extensions.yml` (both optional, priority 10). ✅
-3. **Config** in `.specify/init-options.json` (`umbrella_fanout`: `switch`,
-   `skip_branches`, `exclude`) with `type: submodule` defaults. ✅
+3. **Config** in `.specify/init-options.json` (`umbrella_fanout`: `base`,
+   `switch`, `skip_branches`, `exclude`) with `type: submodule` defaults. ✅
 4. **Safety**: `--dry-run`, best-effort switching (never clobber a dirty
    working tree — untracked files included), idempotent re-runs. Implemented in
    `.specify/scripts/bash/fanout.sh`. ✅

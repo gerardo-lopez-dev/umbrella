@@ -1,0 +1,1 @@
+../../.specify/extensions/umbrella-fanout/.specify-dev/agent-commands/opencode/speckit.umbrella-fanout.fanout.md

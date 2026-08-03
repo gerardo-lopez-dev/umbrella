@@ -1,0 +1,25 @@
+schema_version: "1.0"
+extension:
+  id: umbrella-fanout
+  name: Umbrella Fanout
+  version: 0.1.0
+  description: In-house branch fan-out across module submodules (docs/WORKFLOW.md 4.1)
+  category: workflow
+  effect: read-write
+requires:
+  speckit_version: ">=0.14.0"
+provides:
+  commands:
+    - name: speckit.umbrella-fanout.fanout
+      file: commands/fanout.md
+hooks:
+  after_plan:
+    - command: speckit.umbrella-fanout.fanout
+      optional: true
+      priority: 10
+      description: Fan out the feature branch to the modules listed in plan.md's Affected Repositories
+  after_tasks:
+    - command: speckit.umbrella-fanout.fanout
+      optional: true
+      priority: 10
+      description: Fan out the feature branch to the modules listed in plan.md's Affected Repositories

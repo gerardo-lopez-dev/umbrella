@@ -1,0 +1,25 @@
+installed:
+- umbrella-fanout
+settings:
+  auto_execute_hooks: true
+hooks:
+  after_plan:
+  - extension: umbrella-fanout
+    command: speckit.umbrella-fanout.fanout
+    enabled: true
+    optional: true
+    priority: 10
+    prompt: Execute speckit.umbrella-fanout.fanout?
+    description: Fan out the feature branch to the modules listed in plan.md's Affected
+      Repositories
+    condition: null
+  after_tasks:
+  - extension: umbrella-fanout
+    command: speckit.umbrella-fanout.fanout
+    enabled: true
+    optional: true
+    priority: 10
+    prompt: Execute speckit.umbrella-fanout.fanout?
+    description: Fan out the feature branch to the modules listed in plan.md's Affected
+      Repositories
+    condition: null

@@ -12,6 +12,7 @@ T=/tmp/opencode/fanout-selfcheck
 rm -rf "$T"
 mkdir -p "$T/.specify/scripts/bash" "$T/modulos/specs-lib" \
     "$T/modulos/microservice-template" "$T/modulos/products-service" \
+    "$T/modulos/bff-service" \
     "$T/specs/NNN-checkout"
 cp "$COMMON" "$FANOUT" "$T/.specify/scripts/bash/"
 printf '{"umbrella_fanout":{"type":"submodule","switch":true,"skip_branches":["main","master"],"exclude":[]}}\n' \
@@ -20,8 +21,10 @@ printf '{"umbrella_fanout":{"type":"submodule","switch":true,"skip_branches":["m
 git -C "$T/modulos/specs-lib" init -q && git -C "$T/modulos/specs-lib" checkout -q -b 001-checkout \
     && git -C "$T/modulos/specs-lib" commit -q --allow-empty -m init
 git -C "$T/modulos/microservice-template" init -q \
+    && git -C "$T/modulos/microservice-template" checkout -q -b main \
     && git -C "$T/modulos/microservice-template" commit -q --allow-empty -m init
 git -C "$T/modulos/products-service" init -q \
+    && git -C "$T/modulos/products-service" checkout -q -b main \
     && git -C "$T/modulos/products-service" commit -q --allow-empty -m init
 touch "$T/modulos/products-service/dirty.txt"
 
@@ -51,5 +54,17 @@ assert "no affected modules -> errors, not all repos" \
     bash -c "! bash .specify/scripts/bash/fanout.sh --branch 002-other | grep -q microservice-template"
 assert "dry-run changes nothing" \
     bash -c "git -C '$T/modulos/microservice-template' rev-parse --quiet --verify refs/heads/002-other; test \$? -ne 0"
+
+git -C "$T/modulos/bff-service" init -q
+git -C "$T/modulos/bff-service" checkout -q -b develop
+git -C "$T/modulos/bff-service" commit -q --allow-empty -m base-develop
+git -C "$T/modulos/bff-service" checkout -q -b other
+git -C "$T/modulos/bff-service" commit -q --allow-empty -m base-other
+
+out3="$(bash .specify/scripts/bash/fanout.sh --base develop -m bff-service --branch 004-base)"
+assert "--base creates the feature branch from the given base, not HEAD" \
+    bash -c "[ \"\$(git -C '$T/modulos/bff-service' rev-parse develop)\" = \"\$(git -C '$T/modulos/bff-service' rev-parse 004-base)\" ]"
+assert "--base reported in output" \
+    bash -c "echo '$out3' | grep -q 'created (base: develop)'"
 
 echo "fanout self-check: PASS"

@@ -9,6 +9,7 @@ set -euo pipefail
 DRY_RUN=false
 SWITCH=""             # "" = from config
 BRANCH=""
+BASE=""
 PLAN=""
 MODULES=()
 
@@ -20,6 +21,8 @@ Fan out a feature branch to the affected module submodules.
 
 OPTIONS:
   -b, --branch <name>  Feature branch to create (default: current branch of modulos/specs-lib)
+      --base <branch>  Base branch to create the feature branch from, per module
+                       (default: "main" from config; e.g. --base develop)
   -m, --module <name>  Module to fan out into (repeatable; default: Affected Repositories
                        from --plan)
       --plan <file>    plan.md to read the Affected Repositories list from
@@ -28,10 +31,11 @@ OPTIONS:
   -h, --help           Show this help
 
 CONFIG (.specify/init-options.json -> umbrella_fanout):
-  type         repo kind, default "submodule" (informational)
-  switch       create+checkout the branch, default true
+  type           repo kind, default "submodule" (informational)
+  switch         create+checkout the branch, default true
+  base           base branch for feature branches, default "main"
   skip_branches  never fan out these names, default ["main","master"]
-  exclude      module names to skip, default []
+  exclude        module names to skip, default []
 
 SAFETY: never switches a dirty working tree (skips and reports); existing
 branches are left alone (idempotent re-runs).
@@ -42,6 +46,7 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
         --dry-run) DRY_RUN=true ;;
         -b|--branch) BRANCH="${2:-}"; shift ;;
+        --base) BASE="${2:-}"; shift ;;
         --plan) PLAN="${2:-}"; shift ;;
         -m|--module) MODULES+=("${2:-}"); shift ;;
         --switch) SWITCH="${2:-}"; shift ;;
@@ -72,9 +77,12 @@ PY
 }
 
 CFG_SWITCH="$(read_config switch true)"
+CFG_BASE="$(read_config base '"main"')"
+CFG_BASE="${CFG_BASE//\"/}"
 CFG_SKIP="$(read_config skip_branches '["main","master"]')"
 CFG_EXCLUDE="$(read_config exclude '[]')"
 [[ -n "$SWITCH" ]] && CFG_SWITCH="$SWITCH"
+[[ -n "$BASE" ]] || BASE="$CFG_BASE"
 
 # --- resolve branch ---
 if [[ -z "$BRANCH" ]]; then
@@ -158,22 +166,41 @@ for m in "${MODULES[@]}"; do
     fi
 
     # best-effort: never clobber a dirty working tree (includes untracked files)
-    if [[ "$CFG_SWITCH" == "true" ]] && [[ -n "$(git -C "$mdir" status --porcelain 2>/dev/null)" ]]; then
+    if [[ "$CFG_SWITCH" == "true" || -n "$BASE" ]] && [[ -n "$(git -C "$mdir" status --porcelain 2>/dev/null)" ]]; then
         echo "  - $m: SKIP (dirty working tree — switch it manually)"
         continue
     fi
 
     if [[ "$DRY_RUN" == true ]]; then
         cmd="git -C modulos/$m fetch origin"
-        [[ "$CFG_SWITCH" == "true" ]] && cmd="$cmd && git -C modulos/$m checkout -b $BRANCH"
-        echo "  - $m: would run: $cmd"
-    else
-        git -C "$mdir" fetch origin >/dev/null 2>&1 || true
-        if git -C "$mdir" checkout -b "$BRANCH" >/dev/null 2>&1; then
-            echo "  - $m: created"
-        else
-            echo "  - $m: FAILED (checkout -b failed — do it manually)"
+        if [[ "$CFG_SWITCH" == "true" ]]; then
+            if [[ -n "$BASE" ]]; then
+                cmd="$cmd && git -C modulos/$m checkout -b $BRANCH origin/$BASE"
+            else
+                cmd="$cmd && git -C modulos/$m checkout -b $BRANCH"
+            fi
         fi
+        echo "  - $m: would run: $cmd"
+        continue
+    fi
+
+    git -C "$mdir" fetch origin >/dev/null 2>&1 || true
+    BASE_REF=""
+    if [[ -n "$BASE" ]]; then
+        if git -C "$mdir" rev-parse --verify --quiet "refs/remotes/origin/$BASE" >/dev/null; then
+            BASE_REF="origin/$BASE"
+        elif git -C "$mdir" rev-parse --verify --quiet "refs/heads/$BASE" >/dev/null; then
+            BASE_REF="$BASE"
+        else
+            echo "  - $m: FAILED (base '$BASE' not found in local or origin — fetch/push it first)"
+            continue
+        fi
+    fi
+
+    if [[ "$CFG_SWITCH" == "true" ]] && git -C "$mdir" checkout -b "$BRANCH" $BASE_REF >/dev/null 2>&1; then
+        echo "  - $m: created (base: ${BASE_REF:-HEAD})"
+    else
+        echo "  - $m: FAILED (checkout -b failed — do it manually)"
     fi
 done
 

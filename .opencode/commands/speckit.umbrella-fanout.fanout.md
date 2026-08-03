@@ -16,8 +16,8 @@ You **MUST** consider the user input before proceeding (if not empty).
 ## Outline
 
 1. **Resolve config**: read the `umbrella_fanout` block in `.specify/init-options.json`
-   (`type`, `switch`, `skip_branches`, `exclude`). Absent keys default to
-   `submodule`, `true`, `["main","master"]`, `[]`.
+   (`type`, `switch`, `base`, `skip_branches`, `exclude`). Absent keys default to
+   `submodule`, `true`, `"main"`, `["main","master"]`, `[]`.
 
 2. **Resolve the feature branch**:
    - `--branch <name>` from user input wins.
@@ -37,9 +37,16 @@ You **MUST** consider the user input before proceeding (if not empty).
    ```sh
    .specify/scripts/bash/fanout.sh \
      --branch <feature-branch> \
+     [--base <base-branch>] \
      -m <module-1> [-m <module-N>...] \
      [--dry-run]
    ```
+
+   `--base` selects the branch each module's feature branch is created from.
+   Default is `main` (config `umbrella_fanout.base`), always the latest
+   `origin/main` after the fetch (fallback: local `main`). This is how you get a
+   feature out of `develop` in a module when a `develop` trunk exists. One branch
+   name, per-module base.
 
    Always recommend a `--dry-run` first so the user sees exactly what changes.
 

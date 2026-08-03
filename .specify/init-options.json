@@ -8,6 +8,7 @@
   "umbrella_fanout": {
     "type": "submodule",
     "switch": true,
+    "base": "main",
     "skip_branches": [
       "main",
       "master"

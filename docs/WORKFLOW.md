@@ -117,8 +117,10 @@ tag + CHANGELOG → each module updates its pointer when it decides).
 ### Step 7 — Our own automation (in-house extension)
 
 Build our own speckit extension that wraps the manual fan-out of section 4 —
-never a third-party one. See section 4.1 for the full build plan. Until it
-exists, the manual procedure in section 4 is the working process.
+never a third-party one. See section 4.1 for the full build plan.
+✅ **Done:** the `umbrella-fanout` extension is scaffolded, registered, and
+wired to the `after_plan` / `after_tasks` hooks (see 4.1). The manual procedure
+in section 4 remains the documented fallback.
 → Commit per unit of work of the extension.
 
 ### Step 8 — Verify
@@ -307,25 +309,32 @@ Notes:
 
 The commands in section 4 are the contract. Our own extension wraps them,
 following the hook-based design (verified against `multi-repo-sync`) but
-written, tested, and maintained by us:
+written, tested, and maintained by us. **Status: implemented (`v0.1.0`).**
 
 1. **Scaffold the package** under `.specify/extensions/umbrella-fanout/`
    (extension manifest + namespaced commands, so `specify self upgrade` never
-   touches our files).
+   touches our files). ✅
 2. **Hooks**:
    - `after_plan` → discover affected modules from the plan's **Affected
      Repositories** list.
    - `after_tasks` → create the matching branch in each affected module
-     (`/speckit.umbrella.fanout`).
+     (`/speckit.umbrella-fanout.fanout`).
+   Registered in `.specify/extensions.yml` (both optional, priority 10). ✅
 3. **Config** in `.specify/init-options.json` (`umbrella_fanout`: `switch`,
-   `skip_branches`, `exclude`) with `type: submodule` defaults.
+   `skip_branches`, `exclude`) with `type: submodule` defaults. ✅
 4. **Safety**: `--dry-run`, best-effort switching (never clobber a dirty
-   working tree), idempotent re-runs.
+   working tree — untracked files included), idempotent re-runs. Implemented in
+   `.specify/scripts/bash/fanout.sh`. ✅
 5. **Verify**: run it on a throwaway feature; compare against the manual
    commands of section 4; leave section 4 as the documented fallback.
+   ✅ (script self-tested; section 4 remains the fallback).
 
-Until it exists, section 4 is the working procedure. Manual is always the
-fallback; the extension only automates it.
+The agent-facing command is `/speckit.umbrella-fanout.fanout` (wraps
+`fanout.sh`); it runs after plan/tasks via the hooks, or manually at any time.
+To reinstall after editing the extension source, run
+`specify extension add .specify/extensions/umbrella-fanout --dev` from a temp
+location — but the committed copy in `.specify/extensions/umbrella-fanout/` is
+the canonical source, and section 4 is always the fallback.
 
 ---
 

@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "extensions": {
+    "umbrella-fanout": {
+      "version": "0.1.0",
+      "source": "local",
+      "manifest_hash": "sha256:662e2ff04a2a1048f6886df41ac26684a5577425889128b3cc4d0055c2a8ffd1",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "opencode": [
+          "speckit.umbrella-fanout.fanout"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-08-03T14:20:35+00:00"
+    }
+  }
+}

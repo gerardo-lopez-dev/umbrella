@@ -4,5 +4,14 @@
   "here": true,
   "integration": "opencode",
   "script": "sh",
-  "speckit_version": "0.14.2"
+  "speckit_version": "0.14.2",
+  "umbrella_fanout": {
+    "type": "submodule",
+    "switch": true,
+    "skip_branches": [
+      "main",
+      "master"
+    ],
+    "exclude": []
+  }
 }

@@ -15,13 +15,17 @@ y se borran tras el merge. Sin `develop`, sin `release/*`, sin `hotfix/*`.
 1. `main` es la única troncal. Nunca se commitea directo a ella.
 2. Todo cambio es una rama de feature de vida corta → PR → merge a `main` →
    borrar la rama.
-3. Los nombres de rama usan el tag de feature: `NNN-slug` (ej.
+3. **Una rama hija pasa a `main` SIEMPRE por PR + `squash and merge`.** Nunca
+   directo, nunca merge commit, nunca rebase. `main` queda limpio: un commit por
+   PR. Comando: `gh pr merge <n> --squash --delete-branch`. Aplica a todos los
+   repos (umbrella, specs, cada módulo).
+4. Los nombres de rama usan el tag de feature: `NNN-slug` (ej.
    `001-spring-profiles`). El nombre lo **decide el asistente**, no se teclea:
    `NNN` del número de post del ROADMAP, `slug` el título del feature en
    kebab-case.
-4. Un solo nombre de rama por feature en todos los repos que toca (mismo
+5. Un solo nombre de rama por feature en todos los repos que toca (mismo
    nombre, varios repos — los PRs se alinean).
-5. Una rama de feature siempre nace del `main` actual del repo donde vive —
+6. Una rama de feature siempre nace del `main` actual del repo donde vive —
    garantizado por `fanout.sh`, cuya base por defecto es `main` (config
    `umbrella_fanout.base`, resuelta a `origin/main` tras el fetch).
 
@@ -41,7 +45,8 @@ y se borran tras el merge. Sin `develop`, sin `release/*`, sin `hotfix/*`.
 
 ## Enforcement (protección de rama en `main`)
 
-El `main` de cada módulo está protegido: 1 review aprobando, CI requerido
+El `main` de cada módulo está protegido: PR requerido (sin aprobación
+obligatoria — setup solo-dev, el dueño squash-mergea su propio PR), CI requerido
 (auto-detectado de `.github/workflows/`), admins incluidos, sin force-push, sin
 deletions. Se aplica al añadir un módulo nuevo:
 

@@ -41,25 +41,30 @@ Tabla de targets:
 
 2. **Despacha la fase** (todos los comandos corren desde la raíz del umbrella):
 
-   - **`specify [<feature>]`** → crear la feature en el repo de specs. El nombre
-     sigue la convención `NNN-slug` (`BRANCHING.md`): `NNN` del número de post
-     del ROADMAP, `slug` el título en kebab-case. Si no se da, derívalo del item
-     del ROADMAP al que apunta el usuario (ej. "Post 01" →
-     `001-spring-profiles`) y repórtalo. **Antes de crear la feature, garantiza
-     la rama de specs** ejecutando
-     `bash .specify/scripts/bash/ensure-spec-branch.sh --feature <feature>`
-     (crea la rama en `modulos/specs-lib` desde `origin/main` — nunca del tag
-     pineado; idempotente; aborta si el working tree está sucio, repórtalo al
-     usuario para que lo resuelva). Luego setea
-     `SPECIFY_FEATURE_DIRECTORY=modulos/specs-lib/specs/<feature>` para que los
-     scripts speckit del umbrella resuelvan el feature dir correcto; sigue el
-     comando `/speckit.specify` para el resto.
-   - **`plan` / `tasks`** → corren contra el repo de specs con el mismo
-     `SPECIFY_FEATURE_DIRECTORY`. Registra los **Affected Repositories** en
-     `plan.md` (esto conduce el fan-out).
+   **Delegación de modelos**: las fases de specs (`specify`, `plan`, `tasks`)
+   se delegan al subagente `spec-writer` (modelo `opencode-go/deepseek-v4-pro`)
+   y `verify` al subagente `reviewer` (`opencode/deepseek-v4-flash-free`), vía
+   la herramienta Task, para no usar el modelo primario. `implement` y
+   `fanout` corren en el agente actual.
+
+   - **`specify [<feature>]`** → resolver el nombre `NNN-slug` (`BRANCHING.md`):
+     `NNN` del número de post del ROADMAP, `slug` el título en kebab-case. Si
+     no se da, derívalo del item del ROADMAP al que apunta el usuario (ej.
+     "Post 01" → `001-spring-profiles`) y repórtalo. Después invoca al
+     subagente **`spec-writer`** vía Task con: feature dir
+     `modulos/specs-lib/specs/<feature>`, fase `specify`, y "sigue
+     `speckit.specify`" (él garantiza la rama con
+     `.specify/scripts/bash/ensure-spec-branch.sh`, hace el scaffolding,
+     escribe/valida `spec.md` y commitea la fase en `modulos/specs-lib`).
+     Espera su reporte y preséntalo al usuario.
+   - **`plan` / `tasks`** → corren contra el repo de specs con el mismo feature
+     dir. Invoca al subagente **`spec-writer`** vía Task (fase `plan` o
+     `tasks`, feature dir, "sigue `speckit.plan` / `speckit.tasks`"). En `plan`
+     el subagente registra los **Affected Repositories** en `plan.md` (esto
+     conduce el fan-out).
    - **`fanout`** → delega en `/speckit.umbrella-fanout.fanout` (base `main` por
      config, solo módulos afectados, `--dry-run` primero).
-   - **`implement`** → trabajar en `<module>`:
+   - **`implement`** → trabajar en `<module>` (en el agente actual):
      1. Lee `modulos/<module>/.specify/memory/.agent-context` (qué carpeta de
         specs aplica, orden de la cascada de constitution).
      2. Lee el task file del módulo en
@@ -70,10 +75,10 @@ Tabla de targets:
      4. Implementa las tasks del módulo escribiendo/editando archivos bajo
         `modulos/<module>/`. Corre builds/tests como subprocesos con el módulo
         como working dir (ej. `./mvnw test` dentro de `modulos/<module>`).
-   - **`verify`** → a nivel módulo: corre el build/tests de
-     `modulos/<module>`, revisa el task file del módulo; a nivel feature: revisa
-     `tasks.md` y `checklists/` en el feature dir de specs (vía
-     `SPECIFY_FEATURE_DIRECTORY` si hace falta). Reporta PASS/FAIL/PARTIAL.
+   - **`verify`** → invoca al subagente **`reviewer`** vía Task: a nivel módulo
+     (sigue `speckit.verify`, corre build/tests de `modulos/<module>`, revisa
+     el task file del módulo); a nivel feature (revisa `tasks.md` y
+     `checklists/` en el feature dir de specs). Reporta PASS/FAIL/PARTIAL.
 
 3. **Nunca `cd`.** Si un helper de speckit necesita el root propio del target
    (un target con su propio `.specify/feature.json`), setea
@@ -82,12 +87,14 @@ Tabla de targets:
 
 ## Completion Report
 
-Reporta: target usado, fase corrida, feature dir, archivos cambiados (con rutas
-relativas al umbrella) y lo que el usuario debe hacer después (ej. PRs, tag).
+Reporta: target usado, fase corrida, subagente usado (si se delegó), feature
+dir, archivos cambiados (con rutas relativas al umbrella) y lo que el usuario
+debe hacer después (ej. PRs, tag).
 
 ## Done When
 
 - [ ] La fase corrió contra el target pedido con archivos bajo `modulos/<target>` (o specs) — sin `cd`, sin sesión nueva
+- [ ] Las fases de specs (`specify`/`plan`/`tasks`) se delegaron a `spec-writer`; `verify` a `reviewer` — y se reportó el subagente usado
 - [ ] El feature dir `NNN-name` se resolvió y reportó consistentemente entre pasos
 - [ ] Las fases de módulo respetaron `.agent-context` y la cascada de constitution
 - [ ] Resumen reportado al usuario

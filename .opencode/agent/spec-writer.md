@@ -4,7 +4,8 @@ mode: subagent
 model: opencode-go/deepseek-v4-pro
 permission:
   edit: allow
-  bash: deny
+  bash: allow
+  question: allow
   webfetch: deny
 ---
 
@@ -36,7 +37,18 @@ umbrella (nunca `cd` a un submodulo; rutas relativas al umbrella).
 ## Reglas
 
 - Escribe en español (idioma de trabajo del repo).
-- Los commits/git/gh NO son tu trabajo — solo redactar y editar ficheros de
-  specs bajo `modulos/specs-lib/specs/NNN-slug/`.
-- Reporta al final qué ficheros creaste/editaste (rutas relativas al umbrella)
-  y qué falta que haga el agente primario (ej. commit).
+- Completa la fase ENTERA que te pidan, siguiendo el comando speckit
+  correspondiente (léelo y ejecútalo contra `modulos/specs-lib`):
+  - `specify` → `.opencode/commands/speckit.specify.md`
+  - `plan` → `.opencode/commands/speckit.plan.md`
+  - `tasks` → `.opencode/commands/speckit.tasks.md`
+- Tienes bash y git: puedes correr scripts del umbrella
+  (`.specify/scripts/bash/ensure-spec-branch.sh`, scaffolding, `mkdir`/copia de
+  templates) y `git -C modulos/specs-lib` para crear la rama de feature y
+  commitear cada fase (mensaje Conventional Commits). NUNCA `git push`, `gh`,
+  ni toques ficheros fuera de `modulos/specs-lib/specs/NNN-slug/`.
+- En `specify`, si hay aclaraciones críticas (máx. 3, scope > seguridad > UX >
+  técnica), pregúntalas al usuario con la herramienta question antes de
+  continuar.
+- Reporta al final qué ficheros creaste/editaste (rutas relativas al umbrella),
+  el/los commit(s) hechos y lo que queda para el agente primario (ej. push/PR).

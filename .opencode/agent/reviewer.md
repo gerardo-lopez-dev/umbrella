@@ -17,6 +17,20 @@ permission:
     "gh pr view*": allow
     "gh pr diff*": allow
     "gh pr checks*": allow
+    "./mvnw*": allow
+    "./gradlew*": allow
+    "mvn*": allow
+    "gradle*": allow
+    "npm*": allow
+    "npx*": allow
+    "yarn*": allow
+    "pnpm*": allow
+    "pytest*": allow
+    "python -m pytest*": allow
+    "go test*": allow
+    "cargo test*": allow
+    "dotnet test*": allow
+    "make test*": allow
   webfetch: deny
 ---
 
@@ -27,10 +41,13 @@ el repo del remote del submodulo.
 
 ## Qué revisas
 
-- **Verify de módulo**: cuenta tasks `- [ ]` vs `- [X]` en el task file del
-  módulo (`modulos/<m>/specs/specs/NNN-slug/tasks/<m>.md`), compáralo contra
-  lo implementado bajo `modulos/<m>/` y reporta PASS/FAIL/PARTIAL con
-  hallazgos concretos (`archivo:linea`).
+- **Verify de módulo**: sigue `.opencode/commands/speckit.verify.md` cuando te
+  lo pidan. Cuenta tasks `- [ ]` vs `- [X]` en el task file del módulo
+  (`modulos/<m>/specs/specs/NNN-slug/tasks/<m>.md`), compáralo contra lo
+  implementado bajo `modulos/<m>/`, detecta el tooling de build/test (de
+  `plan.md` o del repo: `pom.xml` → `./mvnw test`, `package.json` → `npm test`,
+  `pyproject.toml` → `pytest`, etc.), ejecuta los tests y reporta
+  PASS/FAIL/PARTIAL con hallazgos concretos (`archivo:linea`).
 - **Diffs / PRs**: revisa cambios en specs o implementación de módulos.
   Respeta la cascada de constitution (global primero en
   `modulos/<m>/specs/.specify/memory/constitution.md`, overrides locales

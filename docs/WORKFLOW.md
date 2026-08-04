@@ -5,6 +5,11 @@ punta a punta. Las reglas vinculantes (pinning, cascada, flujo de cambio de
 specs) viven en `AGENTS.md` y `CONTRIBUTING.md`; este documento es el
 procedimiento ejecutable.
 
+> **Para implementar una feature nueva, usa el orquestador:**
+> `/speckit.umbrella.feature <post>` (ver `docs/COMO-HACER-UNA-FEATURE.md`).
+> Este documento describe el procedimiento interno paso a paso y sirve de
+> referencia/fallback.
+
 > **Decisiones:**
 > - **Convención de ramas:** GitHub Flow en todos los repos — `main` como única
 >   troncal, ramas de feature de vida corta mergeadas vía PR y borradas tras el
@@ -56,6 +61,10 @@ Punto de entrada único: `/speckit.umbrella.run <target> <phase>`.
 Ejemplo: `/speckit.umbrella.run microservice-template implement` implementa las
 tasks del módulo (desde su `.agent-context` → su task file en las specs montadas
 en el módulo) sin salir de la raíz del umbrella.
+
+El orquestador `/speckit.umbrella.feature <post>` corre todas las fases en
+secuencia y se detiene solo en los 4 gates humanos (aprobación de spec,
+aprobación de plan, merges de PRs). Usa `deliver.sh` para la Fase 7.
 
 ---
 

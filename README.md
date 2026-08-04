@@ -73,8 +73,17 @@ para el flujo de cambio de specs.
 
 ## Verified state
 
-- Submodulos anclados a `spec-v1.0.1` (`modulos/specs-lib` y
-  `modulos/microservice-template/specs`, mismo commit).
+El estado verificado **no se escribe a mano** — se genera:
+
+```sh
+bash .specify/scripts/bash/doctor.sh [--fetch]
+```
+
+Comprueba materialización de submodulos, árboles limpios, pins a tag y
+consistencia entre `modulos/specs-lib` y cada `modulos/<module>/specs` (mismo
+tag), y con `--fetch` el drift contra `origin`. Usa `--feature <NNN-slug>` para
+el estado observable de una feature (ramas, feature dir, PRs).
+
 - `microservice-template` en `main`; su `main` está protegido (PR requerido,
   CI `build` requerida, strict, admins enforced, sin force-push/deletes).
 - `specs` repo `main` también protegido (PR requerido, admins enforced, sin
@@ -82,4 +91,4 @@ para el flujo de cambio de specs.
 - Protección sin aprobación obligatoria: setup solo-dev — el dueño squash-mergea
   su propio PR (`gh pr merge --squash --delete-branch`). Re-add 1 approval
   cuando haya reviewers.
-- Self-checks PASS: `bash .specify/scripts/bash/{fanout-test,module-bootstrap-test,context-test,ensure-spec-branch-test}.sh`.
+- Self-checks PASS: `bash .specify/scripts/bash/{doctor-test,fanout-test,module-bootstrap-test,context-test,ensure-spec-branch-test}.sh`.

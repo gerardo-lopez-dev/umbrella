@@ -40,7 +40,8 @@ submodulo, y el contexto de speckit se resuelve via
 `SPECIFY_FEATURE_DIRECTORY`. Punto de entrada único para todas las fases:
 
 ```
-/speckit.umbrella.run <target> <phase>
+/speckit.umbrella.feature <post>    # orquesta una feature completa de punta a punta
+/speckit.umbrella.run <target> <phase>   # fases individuales (manual)
 ```
 
 | Target | Root on disk | Phases |
@@ -51,6 +52,11 @@ submodulo, y el contexto de speckit se resuelve via
 
 Los nombres de feature/rama siguen `NNN-slug` (`BRANCHING.md`); el asistente
 los deriva del ROADMAP, no se escriben a mano.
+
+El flujo automatizado se divide entre **automatización** y **puntos de parada
+humanos** (4 gates: approve spec, approve plan, merge PRs de feature, merge PRs
+chore). Todo el resto lo corre `/speckit.umbrella.feature`. Ver
+`docs/COMO-HACER-UNA-FEATURE.md` para la receta completa.
 
 ## Cascada de constitution
 
@@ -91,4 +97,4 @@ el estado observable de una feature (ramas, feature dir, PRs).
 - Protección sin aprobación obligatoria: setup solo-dev — el dueño squash-mergea
   su propio PR (`gh pr merge --squash --delete-branch`). Re-add 1 approval
   cuando haya reviewers.
-- Self-checks PASS: `bash .specify/scripts/bash/{doctor-test,fanout-test,module-bootstrap-test,context-test,ensure-spec-branch-test}.sh`.
+- Self-checks PASS: `bash .specify/scripts/bash/{doctor-test,deliver-test,fanout-test,module-bootstrap-test,context-test,ensure-spec-branch-test}.sh`.

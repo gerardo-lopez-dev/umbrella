@@ -73,10 +73,13 @@ para el flujo de cambio de specs.
 
 ## Verified state
 
-- Submodulos anclados a `spec-v1.0.0` (`modulos/specs-lib` y
+- Submodulos anclados a `spec-v1.0.1` (`modulos/specs-lib` y
   `modulos/microservice-template/specs`, mismo commit).
-- `microservice-template` en `main`; su `main` está protegido (1 review + CI
-  `build` requerida, strict, admins enforced, sin force-push/deletes).
-- `specs` repo `main` también protegido (1 review, admins enforced, sin
+- `microservice-template` en `main`; su `main` está protegido (PR requerido,
+  CI `build` requerida, strict, admins enforced, sin force-push/deletes).
+- `specs` repo `main` también protegido (PR requerido, admins enforced, sin
   force-push/deletes — sin CI; specs no tiene).
+- Protección sin aprobación obligatoria: setup solo-dev — el dueño squash-mergea
+  su propio PR (`gh pr merge --squash --delete-branch`). Re-add 1 approval
+  cuando haya reviewers.
 - Self-checks PASS: `bash .specify/scripts/bash/{fanout-test,module-bootstrap-test,context-test}.sh`.

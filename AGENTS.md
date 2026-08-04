@@ -39,6 +39,9 @@ La estructura objetivo:
    punteros es un acto explícito (ver CONTRIBUTING.md).
 5. Feature = una spec por feature; las tasks se dividen por repo y el
    `.agent-context` de cada módulo apunta a su task file.
+6. **PRs siempre squash-merge, y el merge lo hace el humano.** El agente crea y
+   sube el PR pero NUNCA lo mergea: entrega el PR y avisa al usuario para que lo
+   mergee él (`gh pr merge <n> --squash --delete-branch`).
 
 ## Reglas vinculantes del original (no negociables)
 

@@ -82,4 +82,4 @@ para el flujo de cambio de specs.
 - Protección sin aprobación obligatoria: setup solo-dev — el dueño squash-mergea
   su propio PR (`gh pr merge --squash --delete-branch`). Re-add 1 approval
   cuando haya reviewers.
-- Self-checks PASS: `bash .specify/scripts/bash/{fanout-test,module-bootstrap-test,context-test}.sh`.
+- Self-checks PASS: `bash .specify/scripts/bash/{fanout-test,module-bootstrap-test,context-test,ensure-spec-branch-test}.sh`.

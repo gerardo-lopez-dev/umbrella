@@ -14,8 +14,8 @@ usage() {
     cat <<'EOF'
 Usage: module-bootstrap.sh <module-name> [--dry-run] [--ci job1,job2]
 
-Protect main of modulos/<module> on GitHub: 1 approving review + required CI
-checks (auto-detected from .github/workflows/*.yml).
+Protect main of modulos/<module> on GitHub: PR required (no approvals, solo-dev
+setup) + required CI checks (auto-detected from .github/workflows/*.yml).
 
 OPTIONS:
   --dry-run       Print the payload, change nothing
@@ -64,7 +64,9 @@ contexts = [c for c in os.environ["CI_CONTEXTS"].split(",") if c]
 payload = {
     "required_status_checks": {"strict": True, "contexts": contexts} if contexts else None,
     "required_pull_request_reviews": {
-        "required_approving_review_count": 1,
+        # ponytail: solo-dev setup — PR obligatorio pero sin aprobacion requerida;
+        # el dueño squash-mergea su propio PR. Re-add 1 cuando haya reviewers.
+        "required_approving_review_count": 0,
         "dismiss_stale_reviews": True,
     },
     "enforce_admins": True,

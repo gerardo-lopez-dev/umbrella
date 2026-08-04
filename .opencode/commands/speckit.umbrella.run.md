@@ -45,7 +45,12 @@ Tabla de targets:
      sigue la convención `NNN-slug` (`BRANCHING.md`): `NNN` del número de post
      del ROADMAP, `slug` el título en kebab-case. Si no se da, derívalo del item
      del ROADMAP al que apunta el usuario (ej. "Post 01" →
-     `001-spring-profiles`) y repórtalo. Setea
+     `001-spring-profiles`) y repórtalo. **Antes de crear la feature, garantiza
+     la rama de specs** ejecutando
+     `bash .specify/scripts/bash/ensure-spec-branch.sh --feature <feature>`
+     (crea la rama en `modulos/specs-lib` desde `origin/main` — nunca del tag
+     pineado; idempotente; aborta si el working tree está sucio, repórtalo al
+     usuario para que lo resuelva). Luego setea
      `SPECIFY_FEATURE_DIRECTORY=modulos/specs-lib/specs/<feature>` para que los
      scripts speckit del umbrella resuelvan el feature dir correcto; sigue el
      comando `/speckit.specify` para el resto.

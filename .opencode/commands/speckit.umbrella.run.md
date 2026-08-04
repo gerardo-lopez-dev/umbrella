@@ -67,8 +67,12 @@ Tabla de targets:
    - **`implement`** → trabajar en `<module>` (en el agente actual):
      1. Lee `modulos/<module>/.specify/memory/.agent-context` (qué carpeta de
         specs aplica, orden de la cascada de constitution).
-     2. Lee el task file del módulo en
-        `modulos/<module>/specs/specs/NNN-name/tasks/<module>.md`.
+     2. Lee el task file del módulo. **Resolución**: si existe
+        `modulos/<module>/specs/specs/NNN-name/tasks/<module>.md` úsalo; si no
+        (caso normal pre-tag: el submódulo `specs/` del módulo está en el tag
+        viejo y aún no tiene la feature) léelo desde
+        `modulos/specs-lib/specs/NNN-name/tasks/<module>.md`. Nunca intentes
+        mover el submódulo `specs/` del módulo de tag por tu cuenta.
      3. Lee la cascada de constitution: global primero
         (`modulos/<module>/specs/.specify/memory/constitution.md`), luego local
         (`modulos/<module>/.specify/memory/constitution.md`) si existe.

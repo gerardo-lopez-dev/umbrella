@@ -49,6 +49,9 @@ git submodule update --init --recursive
 > desde `origin/main` (idempotente; aborta si el working tree de specs-lib está
 > sucio — resuélvelo con `git -C modulos/specs-lib status`). El nombre de rama lo
 > deriva del ROADMAP, no lo escribes tú.
+>
+> El script automatiza **solo la rama**: no hay `.sh` para los commits, en specs
+> siguen siendo manuales con `git -C modulos/specs-lib` (abajo).
 
 Esto crea (o usa) `modulos/specs-lib/specs/002-docker/spec.md`. Escribe 2 user
 stories mínimas:
@@ -136,7 +139,11 @@ El plan declara `microservice-template` como afectado → fan-out manual (secci�
 git -C modulos/microservice-template fetch origin
 git -C modulos/microservice-template checkout -b 002-docker origin/main
 
-# o automatizado (extension del paso 08): siempre --dry-run primero
+# o automatizado con el script (extension del paso 08): siempre --dry-run primero
+bash .specify/scripts/bash/fanout.sh --plan modulos/specs-lib/specs/002-docker/plan.md --dry-run
+bash .specify/scripts/bash/fanout.sh --plan modulos/specs-lib/specs/002-docker/plan.md
+
+# equivalente vía wrapper (misma extension)
 /speckit.umbrella.run umbrella fanout --dry-run
 /speckit.umbrella.run umbrella fanout
 ```
@@ -211,12 +218,13 @@ gh pr create --repo gerardo-lopez-dev/microservice-template \
   --body "Implementa Post 02 del ROADMAP."
 ```
 
-**Merge de tu propio PR:** `main` de los módulos está protegido (1 review,
-admins incluidos) y GitHub **no deja aprobar tu propio PR**. Para un repo
-personal, el dueño mergea con admin:
+**Merge del PR lo hace el humano, no el agente** (AGENTS.md regla 6): el agente
+crea y sube el PR y avisa; el dueño mergea con squash. Como `main` de los
+módulos está protegido (1 review, admins incluidos) y GitHub **no deja aprobar
+tu propio PR**, en un repo personal el dueño mergea con admin:
 
 ```sh
-gh pr merge --repo gerardo-lopez-dev/microservice-template --admin --merge --delete-branch
+gh pr merge --repo gerardo-lopez-dev/microservice-template --admin --squash --delete-branch
 ```
 
 > En un proyecto con más gente, el reviewer es otra persona. `--admin` es la
@@ -235,7 +243,8 @@ git -C modulos/specs-lib push -u origin 002-docker
 gh pr create --repo gerardo-lopez-dev/specs \
   --title "002-docker: spec + tasks" \
   --body "Spec, plan y tasks del Post 02. Tasks del modulo completadas."
-gh pr merge --repo gerardo-lopez-dev/specs --admin --merge --delete-branch
+# el merge lo hace el humano (squash), nunca el agente:
+gh pr merge --repo gerardo-lopez-dev/specs --admin --squash --delete-branch
 
 git -C modulos/specs-lib checkout main && git -C modulos/specs-lib pull
 git -C modulos/specs-lib tag -a spec-v1.0.2 -m "spec-v1.0.2: Post 02 docker multistage + compose"
@@ -261,7 +270,8 @@ git add modulos && git commit -m "chore: pin specs a spec-v1.0.2 (Post 02)"
 
 git push -u origin chore-spec-v1.0.2
 gh pr create --title "chore: pin specs a spec-v1.0.2" --body "Absorbe Post 02 en specs-lib y el modulo."
-gh pr merge --merge --delete-branch
+# el merge lo hace el humano (squash), nunca el agente:
+gh pr merge --squash --delete-branch
 ```
 
 ---

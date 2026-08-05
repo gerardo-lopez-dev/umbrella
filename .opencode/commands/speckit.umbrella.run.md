@@ -54,8 +54,8 @@ Tabla de targets:
      subagente **`spec-writer`** vía Task con: feature dir
      `modulos/specs-lib/specs/<feature>`, fase `specify`, y "sigue
      `speckit.specify`" (él garantiza la rama con
-     `.specify/scripts/bash/ensure-spec-branch.sh`, hace el scaffolding,
-     escribe/valida `spec.md` y commitea la fase en `modulos/specs-lib`).
+`.specify/scripts/bash/ensure-spec-branch.sh`, hace el scaffolding,
+      escribe/valida `spec.md` en `modulos/specs-lib`).
      Espera su reporte y preséntalo al usuario.
    - **`plan` / `tasks`** → corren contra el repo de specs con el mismo feature
      dir. Invoca al subagente **`spec-writer`** vía Task (fase `plan` o

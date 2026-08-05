@@ -57,14 +57,17 @@ specify → plan → tasks → fanout → implement → verify → deliver
 
 ## Puntos de parada (los tuyos)
 
-El flujo corre solo entre paradas. Solo 4 momentos requieren tu intervención:
+El flujo corre solo entre paradas. Los gates humanos (ver tabla canónica en `.opencode/commands/speckit.umbrella.feature.md`):
 
 | # | Cuándo | Qué haces |
 |---|--------|-----------|
 | **G1** | Tras `specify` | Revisas/apruebas `spec.md` (la spec es la fuente de verdad) |
 | **G2** | Tras `plan` | Apruebas los **affected repos** y el technical context (conduce el fan-out) |
-| **G3** | `deliver.sh` crea los PRs | Squash-mergeas el PR del módulo + el PR de specs (`gh pr merge --squash --delete-branch` x2) |
-| **G4** | `deliver.sh` crea los PRs chore | Squash-mergeas el PR chore del módulo + el PR chore del umbrella (x2) |
+| **G3** | Tras `tasks` | Apruebas `tasks.md` y task files por módulo |
+| **G4** | Tras `implement` | Apruebas la implementación del módulo |
+| **G5** | Tras `verify` (si hubo fixes) | Apruebas los fixes |
+| **G6** | `deliver.sh` crea los PRs | Squash-mergeas el PR del módulo + el PR de specs (`gh pr merge --squash --delete-branch`) |
+| **G7** | `deliver.sh` crea los PRs chore | Squash-mergeas los PRs chore de módulo + umbrella
 
 Todo lo demás (`tasks`, `fanout`, `implement`, `verify`, `prs`, `tag`, `pin`,
 `close`) lo corre el agente. La versión del tag (`--bump patch|minor|major`,
@@ -99,7 +102,7 @@ crea la rama por ti desde `origin/main`, nunca del tag pineado:
 
 Detrás de escena: `ensure-spec-branch.sh --feature NNN-slug` (idempotente,
 aborta si el working tree de specs-lib está sucio) + delegación al subagente
-`spec-writer`, que scaffolding, escribe `spec.md` y **commitea** la fase.
+`spec-writer`, que scaffolding y escribe `spec.md` (no commitea: el agente primario lo hace tras G1).
 
 **→ PUNTO DE PARADA G1**: revisa `modulos/specs-lib/specs/NNN-slug/spec.md`.
 
@@ -131,7 +134,7 @@ Check) y registra los módulos afectados — lo que conduce el fan-out:
 ```
 
 Genera `tasks.md` (orquestación) y, para features multi-repo, un task file por
-módulo bajo `specs/NNN-slug/tasks/<module>.md`. El subagente commitea.
+módulo bajo `specs/NNN-slug/tasks/<module>.md`. El agente primario commitea tras G3.
 
 ---
 
@@ -193,9 +196,9 @@ Qué hace cada etapa (todo automático, cada una para en el merge que toca):
 
 | Etapa | Qué hace | Tu parada |
 |-------|----------|-----------|
-| `prs` | push ramas de módulos + `gh pr create` por módulo y para specs; marca tasks `[X]`; entrada CHANGELOG con la versión propuesta | **G3**: mergea módulo + specs |
+| `prs` | push ramas de módulos + `gh pr create` por módulo y para specs; marca tasks `[X]`; entrada CHANGELOG con la versión propuesta | **G6**: mergea módulo + specs |
 | `tag` | verifica que todos los PRs de feature están MERGED, crea `spec-v<X.Y.Z>` sobre `main` de specs y lo pushea | — |
-| `pin` | rama `chore-spec-v<X.Y.Z>` por módulo (sube SU specs al tag) y rama `chore-spec-v<X.Y.Z>` en el umbrella (specs-lib al tag, módulo a `origin/main`) | **G4**: mergea chores de módulo + umbrella |
+| `pin` | rama `chore-spec-v<X.Y.Z>` por módulo (sube SU specs al tag) y rama `chore-spec-v<X.Y.Z>` en el umbrella (specs-lib al tag, módulo a `origin/main`) | **G7**: mergea chores de módulo + umbrella |
 | `close` | verifica el merge del umbrella, corre `doctor.sh --fetch`, limpia ramas locales huérfanas | — |
 
 > El número de versión sigue semver: PATCH por feature compatible (default),

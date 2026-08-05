@@ -57,9 +57,12 @@ Si `spec.md` no existe: `/speckit.umbrella.run specs specify <NNN-slug>`.
 El subagente `spec-writer` crea la rama `NNN-slug` en specs-lib
 (`ensure-spec-branch.sh`), scaffolding y escribe `spec.md`.
 
-**→ PUNTO DE PARADA G1**: pregunta al usuario si aprueba la spec. Si pide
-cambios, edítalos en el feature dir. No avances
-sin confirmación explícita ("ok", "aprobado", "siguiente").
+**→ PUNTO DE PARADA G1**: presenta los cambios al usuario (archivos
+creados/editados). Pregunta: "¿Conforme con la spec? ¿Quieres cambios?".
+- Si pide cambios → edítalos en el feature dir → vuelve a preguntar.
+- Si confirma ("ok", "aprobado", "siguiente") → haz commit en specs-lib
+  (`git -C modulos/specs-lib add ... && git -C modulos/specs-lib commit`)
+  con mensaje Conventional Commits → avanza a Fase 2.
 
 ### Fase 2 — Plan
 
@@ -67,15 +70,23 @@ Si `plan.md` no existe: `/speckit.umbrella.run specs plan`.
 El subagente `spec-writer` completa `plan.md` (Technical Context, Constitution
 Check, **Affected Repositories** — los módulos cuya implementación cambiará).
 
-**→ PUNTO DE PARADA G2**: pregunta al usuario si aprueba los affected
-repos y el technical context. Si pide cambios, edítalos. Sin confirmación
-explícita no avances.
+**→ PUNTO DE PARADA G2**: presenta los cambios al usuario. Pregunta:
+"¿Conforme con el plan y los affected repos? ¿Quieres cambios?".
+- Si pide cambios → edítalos en el feature dir → vuelve a preguntar.
+- Si confirma ("ok", "aprobado", "siguiente") → haz commit en specs-lib
+  con Conventional Commits → avanza a Fase 3.
 
 ### Fase 3 — Tasks
 
 Si `tasks.md` y `tasks/<module>.md` no existen:
 `/speckit.umbrella.run specs tasks`.
 El subagente `spec-writer` genera tasks.md + task files por módulo.
+
+**→ PUNTO DE PARADA G2.5**: presenta los cambios al usuario. Pregunta:
+"¿Conforme con las tasks? ¿Quieres cambios?".
+- Si pide cambios → edítalos en el feature dir → vuelve a preguntar.
+- Si confirma ("ok", "aprobado", "siguiente") → haz commit en specs-lib
+  con Conventional Commits → avanza a Fase 4 (fanout).
 
 ### Fase 4 — Fan-out
 
@@ -97,6 +108,13 @@ aún no tiene la feature) → implementa las tasks en la rama
 No avances al siguiente módulo sin que todas las tasks del actual estén
 implementadas.
 
+**→ PUNTO DE PARADA G5 (por módulo)**: presenta los cambios del módulo.
+Pregunta: "¿Conforme con la implementación de <módulo>? ¿Quieres cambios?".
+- Si pide cambios → edítalos → vuelve a preguntar.
+- Si confirma ("ok", "aprobado", "siguiente") → haz commit en el módulo
+  (`git -C modulos/<module> add -A && git -C modulos/<module> commit`)
+  con Conventional Commits → avanza al siguiente módulo o a Fase 6.
+
 ### Fase 6 — Verify
 
 Por cada módulo afectado:
@@ -107,6 +125,11 @@ El subagente `reviewer` cuenta tasks `- [ ]` vs `- [X]`, corre build/tests
 Si algún módulo sale FAIL o PARTIAL → arregla los hallazgos y
 re-ejecuta verify hasta PASS. No sigas a deliver sin PASS en todos los
 módulos.
+
+**→ PUNTO DE PARADA G6**: si hiciste fixes de verify, presenta los cambios.
+Pregunta: "¿Conforme con los fixes de verify? ¿Quieres cambios?".
+- Si pide cambios → edítalos → vuelve a preguntar.
+- Si confirma → haz commit en el módulo.
 
 ### Fase 7 — Deliver
 

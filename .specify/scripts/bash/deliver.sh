@@ -60,7 +60,9 @@ while [[ $# -gt 0 ]]; do
         --dry-run) DRY_RUN=true ;;
         -h|--help) usage; exit 0 ;;
         -*) echo "deliver: unknown argument: $1" >&2; usage >&2; exit 1 ;;
-        *) [[ -z "$FEATURE" ]] && FEATURE="$1" || { echo "deliver: too many arguments" >&2; exit 1; } ;;
+        *) if [[ -z "$FEATURE" ]]; then FEATURE="$1"
+           elif [[ "$1" =~ ^(prs|tag|pin|close)$ ]]; then STAGE="$1"
+           else echo "deliver: too many arguments" >&2; exit 1; fi ;;
     esac
     shift
 done
@@ -189,7 +191,7 @@ t = t[:idx] + "\n\n" + entry + t[idx:]
 open(p, "w", encoding="utf-8").writelines(t)
 PY
             fi
-            run "git -C modulos/specs-lib add specs/$FEATURE modulos/specs-lib/CHANGELOG.md"
+            run "git -C modulos/specs-lib add specs/$FEATURE CHANGELOG.md"
             run "git -C modulos/specs-lib commit -m 'feat(specs): tasks $FEATURE completadas + changelog $version'"
             run "git -C modulos/specs-lib push -u origin $FEATURE"
             if [[ "$(pr_state "$(repo_of "$SPECS")" "$FEATURE")" == "none" ]]; then
@@ -197,7 +199,7 @@ PY
                 gh pr create --repo "$(repo_of "$SPECS")" --title "$FEATURE: spec + tasks" --body "$body" >/dev/null
             fi
         else
-            run "git -C modulos/specs-lib add specs/$FEATURE modulos/specs-lib/CHANGELOG.md"
+            run "git -C modulos/specs-lib add specs/$FEATURE CHANGELOG.md"
             run "git -C modulos/specs-lib commit -m 'feat(specs): tasks $FEATURE completadas + changelog $version'"
             run "git -C modulos/specs-lib push -u origin $FEATURE"
             echo "  specs: gh pr create --repo $(repo_of "$SPECS") --title '$FEATURE: spec + tasks'"
@@ -218,8 +220,6 @@ stage_tag() {
         echo "  tag $version ya existe (skip)"
         return
     fi
-    run "git -C modulos/specs-lib checkout main"
-    run "git -C modulos/specs-lib pull origin main"
     if [[ "$DRY_RUN" != true ]]; then        git -C "$SPECS" checkout -q main
         git -C "$SPECS" pull origin main -q 2>/dev/null || git -C "$SPECS" pull -q 2>/dev/null || true
         git -C "$SPECS" tag -a "$version" -m "$version: $FEATURE $(feature_title)"

@@ -63,8 +63,9 @@ tasks del módulo (desde su `.agent-context` → su task file en las specs monta
 en el módulo) sin salir de la raíz del umbrella.
 
 El orquestador `/speckit.umbrella.feature <post>` corre todas las fases en
-secuencia y se detiene solo en los 4 gates humanos (aprobación de spec,
-aprobación de plan, merges de PRs). Usa `deliver.sh` para la Fase 7.
+secuencia y se detiene solo en los gates humanos (aprobación de spec, plan,
+tasks, implementación, verify-fixes, merges de PRs). Usa `deliver.sh` para la
+Fase 7.
 
 ---
 

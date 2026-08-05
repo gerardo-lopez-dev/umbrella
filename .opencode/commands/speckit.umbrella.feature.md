@@ -55,10 +55,10 @@ deliver, ve directo a Fase 7.
 
 Si `spec.md` no existe: `/speckit.umbrella.run specs specify <NNN-slug>`.
 El subagente `spec-writer` crea la rama `NNN-slug` en specs-lib
-(`ensure-spec-branch.sh`), scaffolding, escribe `spec.md` y commitea.
+(`ensure-spec-branch.sh`), scaffolding y escribe `spec.md`.
 
 **→ PUNTO DE PARADA G1**: pregunta al usuario si aprueba la spec. Si pide
-cambios, edítalos en el feature dir y commitea en specs-lib. No avances
+cambios, edítalos en el feature dir. No avances
 sin confirmación explícita ("ok", "aprobado", "siguiente").
 
 ### Fase 2 — Plan
@@ -91,7 +91,7 @@ Por cada módulo afectado:
 `/speckit.umbrella.run <module> implement`.
 El agente lee `.agent-context` → cascada de constitution → task file del
 módulo (con fallback a `modulos/specs-lib` si el submódulo specs del módulo
-aún no tiene la feature) → implementa las tasks → commitea en la rama
+aún no tiene la feature) → implementa las tasks en la rama
 `NNN-slug` del módulo.
 
 No avances al siguiente módulo sin que todas las tasks del actual estén
@@ -104,7 +104,7 @@ Por cada módulo afectado:
 El subagente `reviewer` cuenta tasks `- [ ]` vs `- [X]`, corre build/tests
 (`./mvnw test` o equivalente) y reporta PASS/FAIL/PARTIAL.
 
-Si algún módulo sale FAIL o PARTIAL → arregla los hallazgos, commitea, y
+Si algún módulo sale FAIL o PARTIAL → arregla los hallazgos y
 re-ejecuta verify hasta PASS. No sigas a deliver sin PASS en todos los
 módulos.
 

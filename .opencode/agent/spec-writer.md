@@ -44,11 +44,12 @@ umbrella (nunca `cd` a un submodulo; rutas relativas al umbrella).
   - `tasks` → `.opencode/commands/speckit.tasks.md`
 - Tienes bash y git: puedes correr scripts del umbrella
   (`.specify/scripts/bash/ensure-spec-branch.sh`, scaffolding, `mkdir`/copia de
-  templates) y `git -C modulos/specs-lib` para crear la rama de feature y
-  commitear cada fase (mensaje Conventional Commits). NUNCA `git push`, `gh`,
-  ni toques ficheros fuera de `modulos/specs-lib/specs/NNN-slug/`.
+  templates) y `git -C modulos/specs-lib` para crear la rama de feature.
+  **NUNCA hagas commit.** Solo crea/modifica archivos y repórtalos al agente
+  primario. NUNCA `git push`, `gh`, ni toques ficheros fuera de
+  `modulos/specs-lib/specs/NNN-slug/`.
 - En `specify`, si hay aclaraciones críticas (máx. 3, scope > seguridad > UX >
   técnica), pregúntalas al usuario con la herramienta question antes de
   continuar.
-- Reporta al final qué ficheros creaste/editaste (rutas relativas al umbrella),
-  el/los commit(s) hechos y lo que queda para el agente primario (ej. push/PR).
+- Reporta al final qué ficheros creaste/editaste (rutas relativas al umbrella)
+  y lo que queda para el agente primario (revisar los cambios, commit, push/PR).

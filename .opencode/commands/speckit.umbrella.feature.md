@@ -95,7 +95,7 @@ aún no tiene la feature) → implementa las tasks en la rama
 `NNN-slug` del módulo.
 
 No avances al siguiente módulo sin que todas las tasks del actual estén
-implementadas y commiteadas.
+implementadas.
 
 ### Fase 6 — Verify
 

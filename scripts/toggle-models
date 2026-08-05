@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+"""Toggle opencode models between free (opencode) and paid (opencode-go).
+
+Toggles 4 fields across 2 files:
+  ~/.config/opencode/opencode.jsonc — small_model, explore, scout
+  .opencode/agent/reviewer.md       — reviewer subagent
+Never touches: general agent, spec-writer subagent.
+"""
+import re
+from pathlib import Path
+
+UMBRELLA = Path(__file__).resolve().parent.parent
+CONFIG = Path.home() / ".config/opencode/opencode.jsonc"
+REVIEWER = UMBRELLA / ".opencode/agent/reviewer.md"
+
+FREE = "opencode/deepseek-v4-flash-free"
+PAID = "opencode-go/deepseek-v4-flash"
+
+config = CONFIG.read_text()
+
+# Detect current state from small_model
+if FREE in config:
+    old, new = FREE, PAID
+    arrow = f"free → paid"
+else:
+    old, new = PAID, FREE
+    arrow = f"paid → free"
+
+print(f"Toggle: {arrow}")
+
+# 1. Global config — toggle small_model, explore.model, scout.model
+config = re.sub(
+    r'"small_model"\s*:\s*"[^"]*"',
+    f'"small_model": "{new}"',
+    config,
+)
+config = re.sub(
+    r'"explore"\s*:\s*\{\s*"model"\s*:\s*"[^"]*"\s*\}',
+    f'"explore": {{ "model": "{new}" }}',
+    config,
+)
+config = re.sub(
+    r'"scout"\s*:\s*\{\s*"model"\s*:\s*"[^"]*"\s*\}',
+    f'"scout": {{ "model": "{new}" }}',
+    config,
+)
+CONFIG.write_text(config)
+print(f"  {CONFIG}: small_model, explore, scout → {new}")
+
+# 2. Reviewer subagent
+reviewer = REVIEWER.read_text()
+reviewer = re.sub(r"^model:\s*\S+", f"model: {new}", reviewer, flags=re.MULTILINE)
+REVIEWER.write_text(reviewer)
+print(f"  {REVIEWER}: reviewer → {new}")
+
+print("Done.")
